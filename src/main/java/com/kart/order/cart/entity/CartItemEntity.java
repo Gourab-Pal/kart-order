@@ -92,4 +92,9 @@ public class CartItemEntity {
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public void increaseQuantity(int quantityToAdd) {
+        this.quantity = this.quantity + quantityToAdd;
+        this.updatedAt = OffsetDateTime.now();
+    }
 }

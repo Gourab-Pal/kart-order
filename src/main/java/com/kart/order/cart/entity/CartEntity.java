@@ -66,4 +66,8 @@ public class CartEntity {
         this.updatedAt = OffsetDateTime.now();
     }
 
+    public boolean isActive() {
+        return this.status.equals("ACTIVE");
+    }
+
 }
