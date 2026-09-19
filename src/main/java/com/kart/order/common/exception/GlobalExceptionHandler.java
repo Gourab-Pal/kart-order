@@ -1,5 +1,6 @@
 package com.kart.order.common.exception;
 
+import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.common.dto.ExceptionResponse;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
 import org.slf4j.Logger;
@@ -19,7 +20,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InventoryAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleInventoryAlreadyExistsException(InventoryAlreadyExistsException exception) {
-        log.info(exception.getMessage());
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionResponse handleProductNotFoundException(ProductNotFoundException exception) {
+        log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
     }
 }

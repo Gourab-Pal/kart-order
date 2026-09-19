@@ -1,5 +1,6 @@
 package com.kart.order.inventory.controller;
 
+import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.inventory.dto.InventoryCreateRequest;
 import com.kart.order.inventory.dto.InventoryResponse;
 import com.kart.order.inventory.service.InventoryService;
@@ -21,7 +22,7 @@ public class InventoryController {
     public InventoryResponse createInventory(
             @Valid
             @RequestBody InventoryCreateRequest inventoryCreateRequest
-    ) {
+    ) throws ProductNotFoundException {
        return inventoryService.createInventory(inventoryCreateRequest);
     }
 }

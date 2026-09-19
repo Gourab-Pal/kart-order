@@ -1,6 +1,7 @@
 package com.kart.order.inventory.service;
 
 import com.kart.order.catalog.client.CatalogClient;
+import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.inventory.dto.InventoryCreateRequest;
 import com.kart.order.inventory.dto.InventoryResponse;
 import com.kart.order.inventory.entity.InventoryEntity;
@@ -21,7 +22,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public InventoryResponse createInventory(InventoryCreateRequest request) {
+    public InventoryResponse createInventory(InventoryCreateRequest request) throws ProductNotFoundException {
         catalogClient.verifyProductExists(request.productId());
         if(inventoryRepository.existsByProductId(request.productId())) {
             throw new InventoryAlreadyExistsException(request.productId());
