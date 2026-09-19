@@ -10,9 +10,8 @@ public class RestClientConfig {
 
     @Bean
     public RestClient catalogRestClient(
-            RestClient.Builder builder,
             @Value("${catalog.service.base-url}") String baseUrl
     ) {
-        return  builder.baseUrl(baseUrl).build();
+        return RestClient.builder().baseUrl(baseUrl).build();
     }
 }

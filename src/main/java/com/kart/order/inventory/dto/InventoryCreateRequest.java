@@ -1,5 +1,6 @@
 package com.kart.order.inventory.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
@@ -10,6 +11,7 @@ public record InventoryCreateRequest(
         UUID productId,
 
         @NotNull(message = "Available quantity can not be null")
+        @Min(value = 0, message = "Available quantity can not be negative")
         int availableQuantity
 ) {
 }

@@ -4,10 +4,8 @@ import com.kart.order.inventory.dto.InventoryCreateRequest;
 import com.kart.order.inventory.dto.InventoryResponse;
 import com.kart.order.inventory.service.InventoryService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/inventory")
@@ -19,6 +17,7 @@ public class InventoryController {
     }
 
     @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
     public InventoryResponse createInventory(
             @Valid
             @RequestBody InventoryCreateRequest inventoryCreateRequest
