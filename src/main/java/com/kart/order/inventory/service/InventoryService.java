@@ -1,7 +1,6 @@
 package com.kart.order.inventory.service;
 
 import com.kart.order.catalog.client.CatalogClient;
-import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.inventory.dto.*;
 import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
