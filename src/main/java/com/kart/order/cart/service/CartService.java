@@ -16,10 +16,8 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse createCart(CartCreateRequest cartCreateRequest) {
-        CartEntity entity = new CartEntity(
-                cartCreateRequest.status()
-        );
+    public CartResponse createCart() {
+        CartEntity entity = new CartEntity("ACTIVE");
         return CartResponse.from(cartRepository.save(entity));
     }
 }
