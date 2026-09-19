@@ -1,6 +1,7 @@
 package com.kart.order.inventory.entity;
 
 import jakarta.persistence.*;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -77,5 +78,28 @@ public class InventoryEntity {
 
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void restock(int quantity) {
+        this.availableQuantity = this.availableQuantity + quantity;
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void reserve(int quantity) {
+        if(this.availableQuantity < quantity) {
+            throw new DataIntegrityViolationException("Requested quantity exceeded available stock");
+        }
+        this.availableQuantity = this.availableQuantity - quantity;
+        this.reservedQuantity = this.reservedQuantity + quantity;
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void release(int quantity) {
+        if(this.reservedQuantity < quantity) {
+            throw new DataIntegrityViolationException("Released quantity exceeded reserved stock");
+        }
+        this.availableQuantity = this.availableQuantity + quantity;
+        this.reservedQuantity = this.reservedQuantity - quantity;
+        this.updatedAt = OffsetDateTime.now();
     }
 }

@@ -2,13 +2,15 @@ package com.kart.order.inventory.service;
 
 import com.kart.order.catalog.client.CatalogClient;
 import com.kart.order.catalog.exception.ProductNotFoundException;
-import com.kart.order.inventory.dto.InventoryCreateRequest;
-import com.kart.order.inventory.dto.InventoryResponse;
+import com.kart.order.inventory.dto.*;
 import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
+import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class InventoryService {
@@ -33,5 +35,36 @@ public class InventoryService {
         );
         InventoryEntity savedEntity = inventoryRepository.save(inventoryEntity);
         return InventoryResponse.from(savedEntity);
+    }
+
+    @Transactional
+    public InventoryResponse findInventory(UUID productId) {
+        catalogClient.verifyProductExists(productId);
+        InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
+        return InventoryResponse.from(entity);
+    }
+
+    @Transactional
+    public InventoryResponse restock(UUID productId, InventoryRestockRequest request) {
+        catalogClient.verifyProductExists(productId);
+        InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
+        entity.restock(request.quantity());
+        return InventoryResponse.from(inventoryRepository.save(entity));
+    }
+
+    @Transactional
+    public InventoryResponse reserve(UUID productId, InventoryReserveRequest request) {
+        catalogClient.verifyProductExists(productId);
+        InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
+        entity.reserve(request.quantity());
+        return InventoryResponse.from(inventoryRepository.save(entity));
+    }
+
+    @Transactional
+    public InventoryResponse release(UUID productId, InventoryReleaseRequest request) {
+        catalogClient.verifyProductExists(productId);
+        InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
+        entity.release(request.quantity());
+        return InventoryResponse.from(inventoryRepository.save(entity));
     }
 }
