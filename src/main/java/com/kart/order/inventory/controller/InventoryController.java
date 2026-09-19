@@ -1,6 +1,5 @@
 package com.kart.order.inventory.controller;
 
-import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.inventory.dto.*;
 import com.kart.order.inventory.service.InventoryService;
 import jakarta.validation.Valid;

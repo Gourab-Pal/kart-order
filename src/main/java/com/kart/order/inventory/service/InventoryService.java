@@ -39,14 +39,12 @@ public class InventoryService {
 
     @Transactional
     public InventoryResponse findInventory(UUID productId) {
-        catalogClient.verifyProductExists(productId);
         InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
         return InventoryResponse.from(entity);
     }
 
     @Transactional
     public InventoryResponse restock(UUID productId, InventoryRestockRequest request) {
-        catalogClient.verifyProductExists(productId);
         InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
         entity.restock(request.quantity());
         return InventoryResponse.from(inventoryRepository.save(entity));
@@ -54,7 +52,6 @@ public class InventoryService {
 
     @Transactional
     public InventoryResponse reserve(UUID productId, InventoryReserveRequest request) {
-        catalogClient.verifyProductExists(productId);
         InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
         entity.reserve(request.quantity());
         return InventoryResponse.from(inventoryRepository.save(entity));
@@ -62,7 +59,6 @@ public class InventoryService {
 
     @Transactional
     public InventoryResponse release(UUID productId, InventoryReleaseRequest request) {
-        catalogClient.verifyProductExists(productId);
         InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
         entity.release(request.quantity());
         return InventoryResponse.from(inventoryRepository.save(entity));
