@@ -1,9 +1,7 @@
 package com.kart.order.cart.controller;
 
-import com.kart.order.cart.dto.CartCreateRequest;
 import com.kart.order.cart.dto.CartResponse;
 import com.kart.order.cart.service.CartService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

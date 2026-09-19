@@ -1,6 +1,5 @@
 package com.kart.order.cart.service;
 
-import com.kart.order.cart.dto.CartCreateRequest;
 import com.kart.order.cart.dto.CartResponse;
 import com.kart.order.cart.entity.CartEntity;
 import com.kart.order.cart.repository.CartRepository;
