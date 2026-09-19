@@ -11,7 +11,7 @@ public record CartItemResponse(
         UUID productId,
         int quantity,
         OffsetDateTime createdAt,
-        OffsetDateTime updateAt
+        OffsetDateTime updatedAt
 ) {
     public static CartItemResponse from(CartItemEntity cartItemEntity) {
         return new  CartItemResponse(

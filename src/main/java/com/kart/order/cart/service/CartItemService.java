@@ -36,16 +36,14 @@ public class CartItemService {
         }
         catalogClient.verifyProductExists(cartItemCreateRequest.productId());
 
-        int quantity = cartItemCreateRequest.quantity();
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, cartItemCreateRequest.productId());
         if(cartItem.isPresent()) {
-            CartItemEntity cartItemEntity = cartItem.get();
-            quantity = quantity +  cartItemEntity.getQuantity();
-            CartItemEntity updatedCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), quantity);
-            return CartItemResponse.from(cartItemRepository.save(updatedCartItem));
+           CartItemEntity existingCartItem = cartItem.get();
+           existingCartItem.increaseQuantity(cartItemCreateRequest.quantity());
+           return CartItemResponse.from(existingCartItem);
         }
 
-        CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), quantity);
+        CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), cartItemCreateRequest.quantity());
         return CartItemResponse.from(cartItemRepository.save(freshCartItem));
     }
 }
