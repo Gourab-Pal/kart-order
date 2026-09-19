@@ -49,4 +49,10 @@ public class InventoryController {
     public InventoryResponse release(@PathVariable UUID productId, @RequestBody @Valid InventoryReleaseRequest inventoryReleaseRequest) {
         return  inventoryService.release(productId, inventoryReleaseRequest);
     }
+
+    @PostMapping("/{productId}/consume")
+    @ResponseStatus(HttpStatus.OK)
+    public InventoryResponse consume(@PathVariable UUID productId, @RequestBody @Valid InventoryConsumeRequest inventoryConsumeRequest) {
+        return  inventoryService.consume(productId, inventoryConsumeRequest);
+    }
 }

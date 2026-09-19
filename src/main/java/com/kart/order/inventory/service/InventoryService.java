@@ -62,4 +62,11 @@ public class InventoryService {
         entity.release(request.quantity());
         return InventoryResponse.from(inventoryRepository.save(entity));
     }
+
+    @Transactional
+    public InventoryResponse consume(UUID productId, InventoryConsumeRequest request) {
+        InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
+        entity.consume(request.quantity());
+        return InventoryResponse.from(inventoryRepository.save(entity));
+    }
 }
