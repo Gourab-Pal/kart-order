@@ -6,7 +6,8 @@ import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         log.error(exception.getMessage());
-        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+        FieldError fieldError = exception.getBindingResult().getFieldErrors().get(0);
+        return new ExceptionResponse(fieldError.getDefaultMessage(), OffsetDateTime.now());
     }
 }
