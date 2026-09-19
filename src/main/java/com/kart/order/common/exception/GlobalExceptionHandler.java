@@ -1,5 +1,7 @@
 package com.kart.order.common.exception;
 
+import com.kart.order.cart.exception.CartNotFoundException;
+import com.kart.order.cart.exception.IllegalCartStateException;
 import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.common.dto.ExceptionResponse;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
@@ -61,6 +63,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(CartNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionResponse handleCartNotFoundException(CartNotFoundException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(IllegalCartStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleIllegalCartStateException(IllegalCartStateException exception) {
         log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
     }
