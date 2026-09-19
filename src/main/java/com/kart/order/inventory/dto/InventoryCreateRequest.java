@@ -12,6 +12,6 @@ public record InventoryCreateRequest(
 
         @NotNull(message = "Available quantity can not be null")
         @Min(value = 0, message = "Available quantity can not be negative")
-        int availableQuantity
+        Integer availableQuantity
 ) {
 }

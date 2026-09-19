@@ -22,7 +22,7 @@ public class InventoryController {
     public InventoryResponse createInventory(
             @Valid
             @RequestBody InventoryCreateRequest inventoryCreateRequest
-    ) throws ProductNotFoundException {
+    ) {
        return inventoryService.createInventory(inventoryCreateRequest);
     }
 }

@@ -22,7 +22,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public InventoryResponse createInventory(InventoryCreateRequest request) throws ProductNotFoundException {
+    public InventoryResponse createInventory(InventoryCreateRequest request) {
         catalogClient.verifyProductExists(request.productId());
         if(inventoryRepository.existsByProductId(request.productId())) {
             throw new InventoryAlreadyExistsException(request.productId());

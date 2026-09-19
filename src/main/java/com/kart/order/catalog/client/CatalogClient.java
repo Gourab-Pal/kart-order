@@ -16,7 +16,7 @@ public class CatalogClient {
         this.catalogRestClient = catalogRestClient;
     }
 
-    public void verifyProductExists(UUID productId) throws ProductNotFoundException {
+    public void verifyProductExists(UUID productId) {
         try {
             catalogRestClient
                     .get()
