@@ -39,10 +39,13 @@ public class CartItemService {
         int quantity = cartItemCreateRequest.quantity();
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, cartItemCreateRequest.productId());
         if(cartItem.isPresent()) {
-            quantity = quantity + cartItem.get().getQuantity();
+            CartItemEntity cartItemEntity = cartItem.get();
+            quantity = quantity +  cartItemEntity.getQuantity();
+            CartItemEntity updatedCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), quantity);
+            return CartItemResponse.from(cartItemRepository.save(updatedCartItem));
         }
 
-        CartItemEntity newCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), quantity);
-        return CartItemResponse.from(cartItemRepository.save(newCartItem));
+        CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), quantity);
+        return CartItemResponse.from(cartItemRepository.save(freshCartItem));
     }
 }
