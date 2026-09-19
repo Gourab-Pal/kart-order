@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.time.OffsetDateTime;
 
@@ -39,5 +40,12 @@ public class GlobalExceptionHandler {
         log.error(exception.getMessage());
         FieldError fieldError = exception.getBindingResult().getFieldErrors().get(0);
         return new ExceptionResponse(fieldError.getDefaultMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExceptionResponse handleResourceAccessException(ResourceAccessException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse("Service unavailable: " + exception.getMessage(), OffsetDateTime.now());
     }
 }
