@@ -6,6 +6,7 @@ import com.kart.order.cart.dto.CartItemResponse;
 import com.kart.order.cart.dto.CartItemSummaryResponse;
 import com.kart.order.cart.entity.CartEntity;
 import com.kart.order.cart.entity.CartItemEntity;
+import com.kart.order.cart.exception.CartItemNotFoundException;
 import com.kart.order.cart.exception.CartNotFoundException;
 import com.kart.order.cart.exception.IllegalCartStateException;
 import com.kart.order.cart.repository.CartItemRepository;
@@ -42,10 +43,12 @@ public class CartItemService {
         if(cartItem.isPresent()) {
            CartItemEntity existingCartItem = cartItem.get();
            existingCartItem.increaseQuantity(cartItemCreateRequest.quantity());
+           cart.touch();
            return CartItemResponse.from(existingCartItem);
         }
 
         CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), cartItemCreateRequest.quantity());
+        cart.touch();
         return CartItemResponse.from(cartItemRepository.save(freshCartItem));
     }
 
@@ -57,10 +60,11 @@ public class CartItemService {
         }
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, productId);
         if(cartItem.isEmpty()) {
-            throw new IllegalArgumentException("CartItem not found");
+            throw new CartItemNotFoundException(cartId, productId);
         }
         CartItemEntity cartItemEntity = cartItem.get();
         cartItemEntity.updateItemQuantity(cartItemQuantityUpdateRequest.quantity());
+        cart.touch();
         return CartItemSummaryResponse.from(cartItemEntity);
     }
 }

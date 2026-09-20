@@ -70,4 +70,8 @@ public class CartEntity {
         return this.status.equals("ACTIVE");
     }
 
+    public void touch() {
+        this.updatedAt = OffsetDateTime.now();
+    }
+
 }
