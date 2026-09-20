@@ -1,5 +1,6 @@
 package com.kart.order.cart.entity;
 
+import com.kart.order.cart.exception.IllegalCartStateException;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
@@ -62,6 +63,9 @@ public class CartEntity {
     }
 
     public void abandon() {
+        if(!this.status.equals("ACTIVE")) {
+            throw new IllegalCartStateException(this.id, "ACTIVE", this.status);
+        }
         this.status = "ABANDONED";
         this.updatedAt = OffsetDateTime.now();
     }
