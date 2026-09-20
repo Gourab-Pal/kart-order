@@ -33,7 +33,7 @@ public class CheckoutService {
     }
 
     @Transactional
-    public CheckoutCartResponse proceedToCheckout(UUID cartId) {
+    public CheckoutCartResponse getStockSummary(UUID cartId) {
         CartEntity cart = cartRepository.findById(cartId).orElseThrow(()-> new CartNotFoundException(cartId));
         if(!cart.isActive()) {
             throw new IllegalCartStateException(cartId, "ACTIVE", cart.getStatus());

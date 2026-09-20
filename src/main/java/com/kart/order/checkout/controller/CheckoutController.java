@@ -1,14 +1,12 @@
 package com.kart.order.checkout.controller;
 
 import com.kart.order.checkout.dto.CheckoutCartResponse;
-import com.kart.order.checkout.dto.CheckoutItemResponse;
 import com.kart.order.checkout.service.CheckoutService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,7 +19,7 @@ public class CheckoutController {
     }
 
     @GetMapping("/{cartId}")
-    public CheckoutCartResponse proceedToCheckout(@PathVariable UUID cartId) {
-        return checkoutService.proceedToCheckout(cartId);
+    public CheckoutCartResponse getStockSummary(@PathVariable UUID cartId) {
+        return checkoutService.getStockSummary(cartId);
     }
 }
