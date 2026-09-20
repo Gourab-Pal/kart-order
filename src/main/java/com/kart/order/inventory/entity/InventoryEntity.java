@@ -110,4 +110,10 @@ public class InventoryEntity {
         this.reservedQuantity = this.reservedQuantity - quantity;
         this.updatedAt = OffsetDateTime.now();
     }
+
+    public void validateQuantityUpdateRequest(int quantity) {
+        if(this.availableQuantity < quantity) {
+            throw new DataIntegrityViolationException("Consume quantity " + quantity +  " exceeded available stock " + this.availableQuantity);
+        }
+    }
 }

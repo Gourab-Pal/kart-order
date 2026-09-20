@@ -44,16 +44,18 @@ public class CartItemService {
             throw new IllegalCartStateException(cartId, "ACTIVE", cart.getStatus());
         }
         catalogClient.verifyProductExists(cartItemCreateRequest.productId());
-
+        InventoryEntity inventory = inventoryRepository.findByProductId(cartItemCreateRequest.productId()).orElseThrow(()-> new InventoryNotFoundException(cartItemCreateRequest.productId()));
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, cartItemCreateRequest.productId());
         if(cartItem.isPresent()) {
            CartItemEntity existingCartItem = cartItem.get();
+           inventory.validateQuantityUpdateRequest(cartItemCreateRequest.quantity() + existingCartItem.getQuantity());
            existingCartItem.increaseQuantity(cartItemCreateRequest.quantity());
            cart.touch();
            return CartItemResponse.from(existingCartItem);
         }
 
         CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), cartItemCreateRequest.quantity());
+        inventory.validateQuantityUpdateRequest(cartItemCreateRequest.quantity());
         cart.touch();
         return CartItemResponse.from(cartItemRepository.save(freshCartItem));
     }
@@ -71,9 +73,7 @@ public class CartItemService {
         CartItemEntity cartItemEntity = cartItem.get();
 
         InventoryEntity inventory = inventoryRepository.findByProductId(productId).orElseThrow(()-> new InventoryNotFoundException(productId));
-        if(inventory.getAvailableQuantity()<cartItemQuantityUpdateRequest.quantity()) {
-            throw new DataIntegrityViolationException("Consume quantity exceeded available stock");
-        }
+        inventory.validateQuantityUpdateRequest(cartItemQuantityUpdateRequest.quantity());
 
         cartItemEntity.updateItemQuantity(cartItemQuantityUpdateRequest.quantity());
         cart.touch();
