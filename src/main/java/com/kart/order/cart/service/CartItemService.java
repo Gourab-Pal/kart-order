@@ -12,7 +12,11 @@ import com.kart.order.cart.exception.IllegalCartStateException;
 import com.kart.order.cart.repository.CartItemRepository;
 import com.kart.order.cart.repository.CartRepository;
 import com.kart.order.catalog.client.CatalogClient;
+import com.kart.order.inventory.entity.InventoryEntity;
+import com.kart.order.inventory.exception.InventoryNotFoundException;
+import com.kart.order.inventory.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -24,11 +28,13 @@ public class CartItemService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final CatalogClient catalogClient;
+    private final InventoryRepository inventoryRepository;
 
-    public CartItemService(CartRepository cartRepository, CartItemRepository cartItemRepository, CatalogClient catalogClient) {
+    public CartItemService(CartRepository cartRepository, CartItemRepository cartItemRepository, CatalogClient catalogClient, InventoryRepository inventoryRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.catalogClient = catalogClient;
+        this.inventoryRepository = inventoryRepository;
     }
 
     @Transactional
@@ -63,6 +69,12 @@ public class CartItemService {
             throw new CartItemNotFoundException(cartId, productId);
         }
         CartItemEntity cartItemEntity = cartItem.get();
+
+        InventoryEntity inventory = inventoryRepository.findByProductId(productId).orElseThrow(()-> new InventoryNotFoundException(productId));
+        if(inventory.getAvailableQuantity()<cartItemQuantityUpdateRequest.quantity()) {
+            throw new DataIntegrityViolationException("Consume quantity exceeded available stock");
+        }
+
         cartItemEntity.updateItemQuantity(cartItemQuantityUpdateRequest.quantity());
         cart.touch();
         return CartItemSummaryResponse.from(cartItemEntity);
