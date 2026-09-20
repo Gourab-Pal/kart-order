@@ -4,6 +4,7 @@ import com.kart.order.cart.exception.CartItemNotFoundException;
 import com.kart.order.cart.exception.CartNotFoundException;
 import com.kart.order.cart.exception.IllegalCartStateException;
 import com.kart.order.catalog.exception.ProductNotFoundException;
+import com.kart.order.checkout.exception.CheckoutException;
 import com.kart.order.common.dto.ExceptionResponse;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
@@ -85,6 +86,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CartItemNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionResponse handleCartItemNotFoundException(CartItemNotFoundException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(CheckoutException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleCheckoutException(CheckoutException exception) {
         log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
     }
