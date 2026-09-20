@@ -1,8 +1,5 @@
 package com.kart.order.checkout.dto;
 
-import com.kart.order.cart.entity.CartItemEntity;
-import com.kart.order.inventory.entity.InventoryEntity;
-
 import java.util.UUID;
 
 public record CheckoutItemResponse(
@@ -16,7 +13,7 @@ public record CheckoutItemResponse(
                 productId,
                 requestedQuantity,
                 availableQuantity,
-                requestedQuantity < availableQuantity
+                requestedQuantity <= availableQuantity
         );
     }
 }
