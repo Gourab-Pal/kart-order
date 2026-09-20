@@ -7,7 +7,6 @@ import com.kart.order.cart.entity.CartItemEntity;
 import com.kart.order.cart.exception.CartNotFoundException;
 import com.kart.order.cart.repository.CartItemRepository;
 import com.kart.order.cart.repository.CartRepository;
-import com.kart.order.catalog.client.CatalogClient;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
