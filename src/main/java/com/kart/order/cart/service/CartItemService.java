@@ -78,4 +78,15 @@ public class CartItemService {
         cart.touch();
         return CartItemSummaryResponse.from(cartItemEntity);
     }
+
+    @Transactional
+    public void deleteCartItem(UUID cartId, UUID productId) {
+        CartEntity cart = cartRepository.findById(cartId).orElseThrow(()-> new CartNotFoundException(cartId));
+        if(!cart.isActive()) {
+            throw new IllegalCartStateException(cartId, "ACTIVE", cart.getStatus());
+        }
+        CartItemEntity cartItem =  cartItemRepository.findByCartIdAndProductId(cartId, productId).orElseThrow(()-> new CartItemNotFoundException(cartId, productId));
+        cartItemRepository.delete(cartItem);
+        cart.touch();
+    }
 }

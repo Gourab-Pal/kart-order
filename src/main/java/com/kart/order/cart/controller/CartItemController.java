@@ -38,4 +38,13 @@ public class CartItemController {
     ) {
         return  cartItemService.updateCartItemQuantity(cartId, productId, request);
     }
+
+    @DeleteMapping("/{cartId}/items/{productId}/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCartItem(
+            @PathVariable UUID cartId,
+            @PathVariable UUID productId
+    ) {
+        cartItemService.deleteCartItem(cartId, productId);
+    }
 }
