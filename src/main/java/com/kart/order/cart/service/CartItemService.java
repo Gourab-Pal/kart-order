@@ -16,7 +16,6 @@ import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -54,8 +53,8 @@ public class CartItemService {
            return CartItemResponse.from(existingCartItem);
         }
 
-        CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), cartItemCreateRequest.quantity());
         inventory.validateAvailableQuantity(cartItemCreateRequest.quantity());
+        CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), cartItemCreateRequest.quantity());
         cart.touch();
         return CartItemResponse.from(cartItemRepository.save(freshCartItem));
     }
