@@ -28,4 +28,10 @@ public class CartController {
     public CartSummaryResponse getCart(@PathVariable("cartId") UUID cartId) {
         return  cartService.getCart(cartId);
     }
+
+    @PostMapping("/{cartId}/abandon")
+    @ResponseStatus(HttpStatus.OK)
+    public CartResponse abandon(@PathVariable("cartId") UUID cartId) {
+        return  cartService.abandon(cartId);
+    }
 }

@@ -47,4 +47,12 @@ public class CartItemController {
     ) {
         cartItemService.deleteCartItem(cartId, productId);
     }
+
+    @DeleteMapping("/{cartId}/items/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAllCartItems(
+            @PathVariable UUID cartId
+    ) {
+        cartItemService.deleteAllCartItems(cartId);
+    }
 }

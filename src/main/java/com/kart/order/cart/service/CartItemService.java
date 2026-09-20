@@ -89,4 +89,14 @@ public class CartItemService {
         cartItemRepository.delete(cartItem);
         cart.touch();
     }
+
+    @Transactional
+    public void deleteAllCartItems(UUID cartId) {
+        CartEntity cart = cartRepository.findById(cartId).orElseThrow(()-> new CartNotFoundException(cartId));
+        if(!cart.isActive()) {
+            throw new IllegalCartStateException(cartId, "ACTIVE", cart.getStatus());
+        }
+        cartItemRepository.deleteAllByCartId(cartId);
+        cart.touch();
+    }
 }

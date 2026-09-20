@@ -37,4 +37,11 @@ public class CartService {
         List<CartItemEntity> items = cartItemRepository.findAllByCartId(cartId);
         return  CartSummaryResponse.from(cart, items);
     }
+
+    @Transactional
+    public CartResponse abandon(UUID cartId) {
+        CartEntity cart =  cartRepository.findById(cartId).orElseThrow(()-> new CartNotFoundException(cartId));
+        cart.abandon();
+        return CartResponse.from(cart);
+    }
 }
