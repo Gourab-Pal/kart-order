@@ -111,9 +111,9 @@ public class InventoryEntity {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public void validateQuantityUpdateRequest(int quantity) {
+    public void validateAvailableQuantity(int quantity) {
         if(this.availableQuantity < quantity) {
-            throw new DataIntegrityViolationException("Consume quantity " + quantity +  " exceeded available stock " + this.availableQuantity);
+            throw new DataIntegrityViolationException("Required quantity " + quantity +  " exceeded available stock " + this.availableQuantity);
         }
     }
 }

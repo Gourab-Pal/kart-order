@@ -48,14 +48,14 @@ public class CartItemService {
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, cartItemCreateRequest.productId());
         if(cartItem.isPresent()) {
            CartItemEntity existingCartItem = cartItem.get();
-           inventory.validateQuantityUpdateRequest(cartItemCreateRequest.quantity() + existingCartItem.getQuantity());
+           inventory.validateAvailableQuantity(cartItemCreateRequest.quantity() + existingCartItem.getQuantity());
            existingCartItem.increaseQuantity(cartItemCreateRequest.quantity());
            cart.touch();
            return CartItemResponse.from(existingCartItem);
         }
 
         CartItemEntity freshCartItem = new CartItemEntity(cart, cartItemCreateRequest.productId(), cartItemCreateRequest.quantity());
-        inventory.validateQuantityUpdateRequest(cartItemCreateRequest.quantity());
+        inventory.validateAvailableQuantity(cartItemCreateRequest.quantity());
         cart.touch();
         return CartItemResponse.from(cartItemRepository.save(freshCartItem));
     }
@@ -73,7 +73,7 @@ public class CartItemService {
         CartItemEntity cartItemEntity = cartItem.get();
 
         InventoryEntity inventory = inventoryRepository.findByProductId(productId).orElseThrow(()-> new InventoryNotFoundException(productId));
-        inventory.validateQuantityUpdateRequest(cartItemQuantityUpdateRequest.quantity());
+        inventory.validateAvailableQuantity(cartItemQuantityUpdateRequest.quantity());
 
         cartItemEntity.updateItemQuantity(cartItemQuantityUpdateRequest.quantity());
         cart.touch();
