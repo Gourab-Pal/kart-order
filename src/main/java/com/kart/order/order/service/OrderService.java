@@ -18,7 +18,6 @@ import com.kart.order.order.entity.OrderItemEntity;
 import com.kart.order.order.repository.OrderItemRepository;
 import com.kart.order.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.boot.micrometer.metrics.autoconfigure.PropertiesMeterFilter;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -85,6 +84,7 @@ public class OrderService {
                     products.get(i).id(),
                     products.get(i).name(),
                     products.get(i).sku(),
+
                     cartItems.get(i).getQuantity(),
                     products.get(i).price()
             );

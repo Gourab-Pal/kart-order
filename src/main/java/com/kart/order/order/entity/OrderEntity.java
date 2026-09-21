@@ -47,10 +47,6 @@ public class OrderEntity {
             throw new IllegalArgumentException("Cart id cannot be null");
         }
 
-        if (totalAmount == null || totalAmount.signum() < 0) {
-            throw new IllegalArgumentException("Order total amount cannot be negative");
-        }
-
         this.cartId = cartId;
         this.status = "PENDING";
         this.totalAmount = BigDecimal.ZERO;
@@ -116,6 +112,9 @@ public class OrderEntity {
     }
 
     public void updateTotalAmount(BigDecimal totalAmount) {
+        if(totalAmount==null || totalAmount.signum()<0) {
+            throw new IllegalArgumentException("Total amount cannot be negative");
+        }
         this.totalAmount = totalAmount;
         this.updatedAt = OffsetDateTime.now();
     }
