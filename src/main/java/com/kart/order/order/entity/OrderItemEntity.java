@@ -7,7 +7,19 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "order_items", schema = "kart_order", uniqueConstraints = {@UniqueConstraint(name = "unique_order_product", columnNames = {"order_id", "product_id"})})
+@Table(
+        name = "order_items",
+        schema = "kart_order",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "unique_order_product",
+                        columnNames = {
+                                "order_id",
+                                "product_id"
+                        }
+                )
+        }
+)
 public class OrderItemEntity {
 
     @Id
@@ -30,10 +42,20 @@ public class OrderItemEntity {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 12, scale = 2)
+    @Column(
+            name = "unit_price",
+            nullable = false,
+            precision = 12,
+            scale = 2
+    )
     private BigDecimal unitPrice;
 
-    @Column(name = "line_total", nullable = false, precision = 12, scale = 2)
+    @Column(
+            name = "line_total",
+            nullable = false,
+            precision = 12,
+            scale = 2
+    )
     private BigDecimal lineTotal;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -42,31 +64,50 @@ public class OrderItemEntity {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    protected OrderItemEntity() {}
+    protected OrderItemEntity() {
+    }
 
-    public OrderItemEntity(UUID productId, String productName, String sku, int quantity, BigDecimal unitPrice) {
+    public OrderItemEntity(
+            OrderEntity order,
+            UUID productId,
+            String productName,
+            String sku,
+            int quantity,
+            BigDecimal unitPrice
+    ) {
+        if (order == null) {
+            throw new IllegalArgumentException(
+                    "Order cannot be null"
+            );
+        }
+
         if (productId == null) {
-            throw new IllegalArgumentException("Product id cannot be null");
+            throw new IllegalArgumentException(
+                    "Product id cannot be null"
+            );
         }
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Order item quantity must be greater than zero");
+            throw new IllegalArgumentException(
+                    "Order item quantity must be greater than zero"
+            );
         }
 
         if (unitPrice == null || unitPrice.signum() < 0) {
-            throw new IllegalArgumentException("Unit price cannot be negative");
+            throw new IllegalArgumentException(
+                    "Unit price cannot be negative"
+            );
         }
 
+        this.order = order;
         this.productId = productId;
         this.productName = productName;
         this.sku = sku;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
-        this.lineTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
-    }
-
-    void assignOrder(OrderEntity order) {
-        this.order = order;
+        this.lineTotal = unitPrice.multiply(
+                BigDecimal.valueOf(quantity)
+        );
     }
 
     @PrePersist

@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -22,7 +20,12 @@ public class OrderEntity {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
+    @Column(
+            name = "total_amount",
+            nullable = false,
+            precision = 12,
+            scale = 2
+    )
     private BigDecimal totalAmount;
 
     @Column(name = "currency", nullable = false, length = 3)
@@ -34,19 +37,28 @@ public class OrderEntity {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItemEntity> items = new ArrayList<>();
+    protected OrderEntity() {
+    }
 
-    protected OrderEntity() {}
-
-    public OrderEntity(UUID cartId) {
+    public OrderEntity(
+            UUID cartId,
+            BigDecimal totalAmount
+    ) {
         if (cartId == null) {
-            throw new IllegalArgumentException("Cart id cannot be null");
+            throw new IllegalArgumentException(
+                    "Cart id cannot be null"
+            );
+        }
+
+        if (totalAmount == null || totalAmount.signum() < 0) {
+            throw new IllegalArgumentException(
+                    "Order total amount cannot be negative"
+            );
         }
 
         this.cartId = cartId;
         this.status = "PENDING";
-        this.totalAmount = BigDecimal.ZERO;
+        this.totalAmount = totalAmount;
         this.currency = "INR";
     }
 
@@ -62,15 +74,11 @@ public class OrderEntity {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public void addItem(OrderItemEntity item) {
-        item.assignOrder(this);
-        this.items.add(item);
-        recalculateTotal();
-    }
-
     public void confirm() {
         if (!this.status.equals("PENDING")) {
-            throw new IllegalStateException("Only pending orders can be confirmed");
+            throw new IllegalStateException(
+                    "Only pending orders can be confirmed"
+            );
         }
 
         this.status = "CONFIRMED";
@@ -79,19 +87,12 @@ public class OrderEntity {
 
     public void cancel() {
         if (this.status.equals("CANCELLED")) {
-            throw new IllegalStateException("Order is already cancelled");
+            throw new IllegalStateException(
+                    "Order is already cancelled"
+            );
         }
 
         this.status = "CANCELLED";
-        this.updatedAt = OffsetDateTime.now();
-    }
-
-    public void recalculateTotal() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (OrderItemEntity item : items) {
-            total = total.add(item.getLineTotal());
-        }
-        this.totalAmount = total;
         this.updatedAt = OffsetDateTime.now();
     }
 
@@ -122,9 +123,4 @@ public class OrderEntity {
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-    public List<OrderItemEntity> getItems() {
-        return items;
-    }
 }
-
