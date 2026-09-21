@@ -1,5 +1,6 @@
 package com.kart.order.catalog.client;
 
+import com.kart.order.catalog.dto.ProductResponse;
 import com.kart.order.catalog.exception.ProductNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -24,6 +25,18 @@ public class CatalogClient {
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException.NotFound e) {
+            throw new ProductNotFoundException(productId);
+        }
+    }
+
+    public ProductResponse getProductById(UUID productId) {
+        try {
+            return catalogRestClient
+                    .get()
+                    .uri("/api/v1/products/{productId}", productId)
+                    .retrieve()
+                    .body(ProductResponse.class);
+        }  catch (HttpClientErrorException.NotFound e) {
             throw new ProductNotFoundException(productId);
         }
     }

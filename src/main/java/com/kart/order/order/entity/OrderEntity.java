@@ -41,24 +41,19 @@ public class OrderEntity {
     }
 
     public OrderEntity(
-            UUID cartId,
-            BigDecimal totalAmount
+            UUID cartId
     ) {
         if (cartId == null) {
-            throw new IllegalArgumentException(
-                    "Cart id cannot be null"
-            );
+            throw new IllegalArgumentException("Cart id cannot be null");
         }
 
         if (totalAmount == null || totalAmount.signum() < 0) {
-            throw new IllegalArgumentException(
-                    "Order total amount cannot be negative"
-            );
+            throw new IllegalArgumentException("Order total amount cannot be negative");
         }
 
         this.cartId = cartId;
         this.status = "PENDING";
-        this.totalAmount = totalAmount;
+        this.totalAmount = BigDecimal.ZERO;
         this.currency = "INR";
     }
 
@@ -76,9 +71,7 @@ public class OrderEntity {
 
     public void confirm() {
         if (!this.status.equals("PENDING")) {
-            throw new IllegalStateException(
-                    "Only pending orders can be confirmed"
-            );
+            throw new IllegalStateException("Only pending orders can be confirmed");
         }
 
         this.status = "CONFIRMED";
@@ -87,9 +80,7 @@ public class OrderEntity {
 
     public void cancel() {
         if (this.status.equals("CANCELLED")) {
-            throw new IllegalStateException(
-                    "Order is already cancelled"
-            );
+            throw new IllegalStateException("Order is already cancelled");
         }
 
         this.status = "CANCELLED";
@@ -122,5 +113,10 @@ public class OrderEntity {
 
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void updateTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+        this.updatedAt = OffsetDateTime.now();
     }
 }

@@ -76,27 +76,19 @@ public class OrderItemEntity {
             BigDecimal unitPrice
     ) {
         if (order == null) {
-            throw new IllegalArgumentException(
-                    "Order cannot be null"
-            );
+            throw new IllegalArgumentException("Order cannot be null");
         }
 
         if (productId == null) {
-            throw new IllegalArgumentException(
-                    "Product id cannot be null"
-            );
+            throw new IllegalArgumentException("Product id cannot be null");
         }
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException(
-                    "Order item quantity must be greater than zero"
-            );
+            throw new IllegalArgumentException("Order item quantity must be greater than zero");
         }
 
         if (unitPrice == null || unitPrice.signum() < 0) {
-            throw new IllegalArgumentException(
-                    "Unit price cannot be negative"
-            );
+            throw new IllegalArgumentException("Unit price cannot be negative");
         }
 
         this.order = order;
