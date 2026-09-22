@@ -108,6 +108,6 @@ public class OrderService {
         // mark cart as checked out
         cart.checkout();
 
-        return PlaceOrderResponse.from(order);
+        return PlaceOrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }
 }
