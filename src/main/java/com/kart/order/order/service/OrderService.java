@@ -8,6 +8,7 @@ import com.kart.order.cart.repository.CartItemRepository;
 import com.kart.order.cart.repository.CartRepository;
 import com.kart.order.catalog.client.CatalogClient;
 import com.kart.order.catalog.dto.ProductResponse;
+import com.kart.order.checkout.exception.CheckoutException;
 import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
@@ -63,7 +64,7 @@ public class OrderService {
         // validate cart has items
         List<CartItemEntity> cartItems = cartItemRepository.findAllByCartId(cart.getId());
         if(cartItems.isEmpty()) {
-            throw new IllegalArgumentException("Cart is empty, can not place order");
+            throw new CheckoutException(cart.getId(), "Cart is empty, can't place order");
         }
 
         // find product details from catalog service
@@ -73,6 +74,9 @@ public class OrderService {
         }
 
         // create empty order with PENDING status
+        if(orderRepository.existsByCartId(cart.getId())) {
+            throw new CheckoutException(cart.getId(), "Order already exists for the given cart");
+        }
         OrderEntity order = new OrderEntity(cart.getId());
         orderRepository.save(order);
 
