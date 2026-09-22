@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
@@ -21,5 +23,11 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public PlaceOrderResponse placeOrder(@Valid @RequestBody PlaceOrderRequest placeOrderRequest) {
         return orderService.placeOrder(placeOrderRequest);
+    }
+
+    @GetMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.OK)
+    public PlaceOrderResponse fetchOrder(@PathVariable UUID orderId) {
+        return orderService.fetchOrder(orderId);
     }
 }

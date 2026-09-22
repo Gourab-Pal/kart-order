@@ -12,10 +12,13 @@ import com.kart.order.checkout.exception.CheckoutException;
 import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
+import com.kart.order.order.dto.OrderItemDetailsResponse;
 import com.kart.order.order.dto.PlaceOrderRequest;
 import com.kart.order.order.dto.PlaceOrderResponse;
 import com.kart.order.order.entity.OrderEntity;
 import com.kart.order.order.entity.OrderItemEntity;
+import com.kart.order.order.exception.IllegalOrderStateException;
+import com.kart.order.order.exception.OrderNotFoundException;
 import com.kart.order.order.repository.OrderItemRepository;
 import com.kart.order.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -107,6 +110,16 @@ public class OrderService {
 
         // mark cart as checked out
         cart.checkout();
+
+        return PlaceOrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
+    }
+
+    @Transactional
+    public PlaceOrderResponse fetchOrder(UUID orderId) {
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
+        if(!order.getStatus().equals("CONFIRMED")) {
+            throw new IllegalOrderStateException(orderId, "CHECKED_OUT", order.getStatus());
+        }
 
         return PlaceOrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }

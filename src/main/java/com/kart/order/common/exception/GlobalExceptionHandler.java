@@ -8,6 +8,8 @@ import com.kart.order.checkout.exception.CheckoutException;
 import com.kart.order.common.dto.ExceptionResponse;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
+import com.kart.order.order.exception.IllegalOrderStateException;
+import com.kart.order.order.exception.OrderNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -93,6 +95,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CheckoutException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleCheckoutException(CheckoutException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleOrderNotFoundException(OrderNotFoundException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(IllegalOrderStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleIllegalOrderStateException(IllegalOrderStateException exception) {
         log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
     }
