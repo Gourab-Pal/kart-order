@@ -102,7 +102,7 @@ public class OrderService {
             inventory.reserve(cartItems.get(i).getQuantity());
         }
 
-        // update totalAmount in parent cart
+        // update totalAmount in order
         order.updateTotalAmount(totalAmount);
 
         // confirm order
