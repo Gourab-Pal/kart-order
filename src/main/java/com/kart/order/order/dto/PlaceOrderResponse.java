@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public record PlaceOrderResponse(
         UUID orderId,
+        String orderStatus,
         UUID cartId,
         BigDecimal orderAmount,
         String currency,
@@ -27,6 +28,7 @@ public record PlaceOrderResponse(
 
         return new PlaceOrderResponse(
                 order.getId(),
+                order.getStatus(),
                 order.getCartId(),
                 order.getTotalAmount(),
                 order.getCurrency(),
