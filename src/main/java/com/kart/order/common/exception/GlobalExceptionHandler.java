@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(OrderNotFoundException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionResponse handleOrderNotFoundException(OrderNotFoundException exception) {
         log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
@@ -115,7 +115,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(OrderException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleOrderException(OrderException exception) {
         log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
