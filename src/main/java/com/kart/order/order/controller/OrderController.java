@@ -1,7 +1,7 @@
 package com.kart.order.order.controller;
 
 import com.kart.order.order.dto.PlaceOrderRequest;
-import com.kart.order.order.dto.PlaceOrderResponse;
+import com.kart.order.order.dto.OrderResponse;
 import com.kart.order.order.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,13 +21,19 @@ public class OrderController {
 
     @PostMapping("/place")
     @ResponseStatus(HttpStatus.CREATED)
-    public PlaceOrderResponse placeOrder(@Valid @RequestBody PlaceOrderRequest placeOrderRequest) {
+    public OrderResponse placeOrder(@Valid @RequestBody PlaceOrderRequest placeOrderRequest) {
         return orderService.placeOrder(placeOrderRequest);
     }
 
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
-    public PlaceOrderResponse fetchOrder(@PathVariable UUID orderId) {
+    public OrderResponse fetchOrder(@PathVariable UUID orderId) {
         return orderService.fetchOrder(orderId);
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    @ResponseStatus(HttpStatus.OK)
+    public OrderResponse cancelOrder(@PathVariable UUID orderId) {
+        return orderService.cancelOrder(orderId);
     }
 }

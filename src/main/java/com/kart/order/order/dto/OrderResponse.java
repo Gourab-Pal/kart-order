@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record PlaceOrderResponse(
+public record OrderResponse(
         UUID orderId,
         String orderStatus,
         UUID cartId,
@@ -18,14 +18,14 @@ public record PlaceOrderResponse(
         List<OrderItemDetailsResponse> items,
         OffsetDateTime timestamp
 ) {
-    public static PlaceOrderResponse from(OrderEntity order, List<OrderItemEntity> items) {
+    public static OrderResponse from(OrderEntity order, List<OrderItemEntity> items) {
 
         List<OrderItemDetailsResponse> itemDetails = new ArrayList<>();
         for (OrderItemEntity orderItemEntity : items) {
             itemDetails.add(OrderItemDetailsResponse.from(orderItemEntity));
         }
 
-        return new PlaceOrderResponse(
+        return new OrderResponse(
                 order.getId(),
                 order.getStatus(),
                 order.getCartId(),

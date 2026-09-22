@@ -13,9 +13,11 @@ import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
 import com.kart.order.order.dto.PlaceOrderRequest;
-import com.kart.order.order.dto.PlaceOrderResponse;
+import com.kart.order.order.dto.OrderResponse;
 import com.kart.order.order.entity.OrderEntity;
 import com.kart.order.order.entity.OrderItemEntity;
+import com.kart.order.order.exception.IllegalOrderStateException;
+import com.kart.order.order.exception.OrderException;
 import com.kart.order.order.exception.OrderNotFoundException;
 import com.kart.order.order.repository.OrderItemRepository;
 import com.kart.order.order.repository.OrderRepository;
@@ -54,7 +56,7 @@ public class OrderService {
     }
 
     @Transactional
-    public PlaceOrderResponse placeOrder(PlaceOrderRequest placeOrderRequest) {
+    public OrderResponse placeOrder(PlaceOrderRequest placeOrderRequest) {
 
         // find and validate cart
         CartEntity cart = cartRepository.findById(placeOrderRequest.cartId()).orElseThrow(()-> new CartNotFoundException(placeOrderRequest.cartId()));
@@ -109,12 +111,39 @@ public class OrderService {
         // mark cart as checked out
         cart.checkout();
 
-        return PlaceOrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
+        return OrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }
 
     @Transactional
-    public PlaceOrderResponse fetchOrder(UUID orderId) {
+    public OrderResponse fetchOrder(UUID orderId) {
         OrderEntity order = orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
-        return PlaceOrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
+        return OrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
+    }
+
+    @Transactional
+    public OrderResponse cancelOrder(UUID orderId) {
+
+        // validate order
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
+        if(!"CONFIRMED".equals(order.getStatus())) {
+            throw new IllegalOrderStateException(orderId, "CONFIRMED", order.getStatus());
+        }
+
+        // load all order items
+        List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(order.getId());
+        if(orderItems.isEmpty()) {
+            throw new OrderException("No order items found for order id " + orderId);
+        }
+
+        // release stock
+        for(OrderItemEntity orderItem : orderItems) {
+            InventoryEntity inventory = inventoryRepository.findByProductId(orderItem.getProductId()).orElseThrow(()-> new InventoryNotFoundException(orderItem.getProductId()));
+            inventory.release(orderItem.getQuantity());
+        }
+
+        // cancel order
+        order.cancel();
+
+        return OrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }
 }
