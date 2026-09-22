@@ -16,7 +16,6 @@ public record PlaceOrderResponse(
         BigDecimal orderAmount,
         String currency,
         List<OrderItemDetailsResponse> items,
-        String message,
         OffsetDateTime timestamp
 ) {
     public static PlaceOrderResponse from(OrderEntity order, List<OrderItemEntity> items) {
@@ -33,7 +32,6 @@ public record PlaceOrderResponse(
                 order.getTotalAmount(),
                 order.getCurrency(),
                 itemDetails,
-                "Order placed successfully",
                 OffsetDateTime.now()
         );
     }
