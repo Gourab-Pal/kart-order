@@ -19,7 +19,8 @@ public class CatalogEventConsumer {
 
     @KafkaListener(
             topics = "${kafka.topic.catalog-events}",
-            groupId = "${spring.kafka.consumer.group-id}"
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "catalogKafkaListenerContainerFactory"
     )
     public void consume(CatalogEvent event) {
         if("PRODUCT_CREATED".equals(event.eventType())) {
