@@ -39,7 +39,7 @@ public class InventoryService {
     @Transactional
     public void createInventoryFromProductCreatedEvent(UUID productId) {
         if(inventoryRepository.existsByProductId(productId)) {
-            throw new InventoryAlreadyExistsException(productId);
+            return;
         }
         InventoryEntity inventoryEntity = new InventoryEntity(productId, 0);
         inventoryRepository.save(inventoryEntity);
