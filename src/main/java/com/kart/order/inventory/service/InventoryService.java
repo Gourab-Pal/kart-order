@@ -37,6 +37,15 @@ public class InventoryService {
     }
 
     @Transactional
+    public void createInventoryFromProductCreatedEvent(UUID productId) {
+        if(inventoryRepository.existsByProductId(productId)) {
+            return;
+        }
+        InventoryEntity inventoryEntity = new InventoryEntity(productId, 0);
+        inventoryRepository.save(inventoryEntity);
+    }
+
+    @Transactional
     public InventoryResponse findInventory(UUID productId) {
         InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
         return InventoryResponse.from(entity);
