@@ -26,12 +26,18 @@ public class CatalogEventConsumer {
             containerFactory = "catalogKafkaListenerContainerFactory"
     )
     public void consume(CatalogEvent event) {
-        if("PRODUCT_CREATED".equals(event.eventType())) {
-            JsonNode payload = event.payload();
-            UUID productId = UUID.fromString(payload.get("productId").asText());
-
-            inventoryService.createInventoryFromProductCreatedEvent(productId);
-            logger.info("Inventory created for product id: {}", productId);
+        switch(event.eventType()) {
+            case "PRODUCT_CREATED" ->
+                handleProductCreated(event);
+            default ->
+                logger.warn("Ignoring unsupported catalog event typr: {}", event.eventType());
         }
+    }
+
+    private void handleProductCreated(CatalogEvent event) {
+        JsonNode payload = event.payload();
+        UUID productId = UUID.fromString(payload.get("productId").asText());
+        inventoryService.createInventoryFromProductCreatedEvent(productId);
+        logger.info("Inventory created for product id: {}", productId);
     }
 }
