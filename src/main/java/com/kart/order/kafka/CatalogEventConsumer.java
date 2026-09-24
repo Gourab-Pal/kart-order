@@ -1,11 +1,14 @@
 package com.kart.order.kafka;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.kart.order.inventory.service.InventoryService;
 import com.kart.order.kafka.event.CatalogEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class CatalogEventConsumer {
@@ -24,8 +27,11 @@ public class CatalogEventConsumer {
     )
     public void consume(CatalogEvent event) {
         if("PRODUCT_CREATED".equals(event.eventType())) {
-            inventoryService.createInventoryFromProductCreatedEvent(event.productCreatedPayload().productId());
-            logger.info("Inventory created for product id: {}", event.productCreatedPayload().productId());
+            JsonNode payload = event.payload();
+            UUID productId = UUID.fromString(payload.get("productId").asText());
+
+            inventoryService.createInventoryFromProductCreatedEvent(productId);
+            logger.info("Inventory created for product id: {}", productId);
         }
     }
 }

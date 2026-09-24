@@ -1,5 +1,7 @@
 package com.kart.order.kafka.event;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -8,6 +10,6 @@ public record CatalogEvent(
         String eventType,
         int eventVersion,
         OffsetDateTime occurredAt,
-        ProductCreatedPayload productCreatedPayload
+        JsonNode payload
 ) {
 }
