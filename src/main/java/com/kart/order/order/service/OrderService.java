@@ -12,6 +12,8 @@ import com.kart.order.checkout.exception.CheckoutException;
 import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
+import com.kart.order.kafka.event.OrderCancelledPayload;
+import com.kart.order.kafka.event.OrderConfirmedPayload;
 import com.kart.order.order.dto.PlaceOrderRequest;
 import com.kart.order.order.dto.OrderResponse;
 import com.kart.order.order.entity.OrderEntity;
@@ -21,6 +23,7 @@ import com.kart.order.order.exception.OrderException;
 import com.kart.order.order.exception.OrderNotFoundException;
 import com.kart.order.order.repository.OrderItemRepository;
 import com.kart.order.order.repository.OrderRepository;
+import com.kart.order.outbox.service.OutboxEventService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +41,7 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final CatalogClient catalogClient;
     private final InventoryRepository inventoryRepository;
+    private final OutboxEventService outboxEventService;
 
     public OrderService(
             OrderRepository orderRepository,
@@ -45,7 +49,8 @@ public class OrderService {
             CartRepository cartRepository,
             CartItemRepository cartItemRepository,
             CatalogClient catalogClient,
-            InventoryRepository inventoryRepository
+            InventoryRepository inventoryRepository,
+            OutboxEventService outboxEventService
             ) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
@@ -53,6 +58,7 @@ public class OrderService {
         this.cartItemRepository = cartItemRepository;
         this.catalogClient = catalogClient;
         this.inventoryRepository = inventoryRepository;
+        this.outboxEventService = outboxEventService;
     }
 
     @Transactional
@@ -111,6 +117,14 @@ public class OrderService {
         // mark cart as checked out
         cart.checkout();
 
+        outboxEventService.saveEvent(
+                "order",
+                order.getId(),
+                "ORDER_CONFIRMED",
+                1,
+                new OrderConfirmedPayload(order.getId(), cart.getId())
+        );
+
         return OrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }
 
@@ -143,6 +157,14 @@ public class OrderService {
 
         // cancel order
         order.cancel();
+
+        outboxEventService.saveEvent(
+                "order",
+                order.getId(),
+                "ORDER_CANCELLED",
+                1,
+                new OrderCancelledPayload(order.getId())
+        );
 
         return OrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }
