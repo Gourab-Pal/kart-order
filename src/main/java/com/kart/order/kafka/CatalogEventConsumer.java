@@ -30,7 +30,7 @@ public class CatalogEventConsumer {
             case "PRODUCT_CREATED" ->
                 handleProductCreated(event);
             default ->
-                logger.warn("Ignoring unsupported catalog event typr: {}", event.eventType());
+                throw new IllegalStateException("Unsupported catalog event type: " + event.eventType());
         }
     }
 
