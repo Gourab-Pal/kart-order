@@ -1,6 +1,6 @@
 package com.kart.order.outbox.service;
 
-import com.kart.order.kafka.event.CatalogEvent;
+import com.kart.order.kafka.event.OrderEvent;
 import com.kart.order.outbox.entity.OutboxEventEntity;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -19,12 +19,12 @@ public class OutboxPublisher {
 
     private static final Logger logger = LoggerFactory.getLogger(OutboxPublisher.class);
     private final OutboxClaimService outboxClaimService;
-    private final KafkaTemplate<String, CatalogEvent> kafkaTemplate;
+    private final KafkaTemplate<String, OrderEvent> kafkaTemplate;
     private final String orderEventsTopic;
 
     public OutboxPublisher(
             OutboxClaimService outboxClaimService,
-            KafkaTemplate<String, CatalogEvent> kafkaTemplate,
+            KafkaTemplate<String, OrderEvent> kafkaTemplate,
             @Value("${kafka.topic.order-events}") String orderEventsTopic
     ) {
         this.outboxClaimService = outboxClaimService;
@@ -42,7 +42,7 @@ public class OutboxPublisher {
 
     private void publish(OutboxEventEntity outboxEvent) {
         try {
-            CatalogEvent event = new CatalogEvent(
+            OrderEvent event = new OrderEvent(
                     outboxEvent.getId(),
                     outboxEvent.getEventType(),
                     outboxEvent.getEventVersion(),
@@ -50,7 +50,7 @@ public class OutboxPublisher {
                     outboxEvent.getPayload()
             );
 
-            ProducerRecord<String, CatalogEvent> record = new ProducerRecord<>(
+            ProducerRecord<String, OrderEvent> record = new ProducerRecord<>(
                     orderEventsTopic,
                     outboxEvent.getAggregateId().toString(),
                     event
@@ -58,7 +58,7 @@ public class OutboxPublisher {
 
             record.headers().add(
                     "source-service",
-                    "kart-catalog".getBytes(StandardCharsets.UTF_8)
+                    "kart-order".getBytes(StandardCharsets.UTF_8)
             );
 
             kafkaTemplate.send(record).get(10, TimeUnit.SECONDS);
