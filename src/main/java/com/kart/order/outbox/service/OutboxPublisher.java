@@ -20,16 +20,16 @@ public class OutboxPublisher {
     private static final Logger logger = LoggerFactory.getLogger(OutboxPublisher.class);
     private final OutboxClaimService outboxClaimService;
     private final KafkaTemplate<String, CatalogEvent> kafkaTemplate;
-    private final String catalogEventsTopic;
+    private final String orderEventsTopic;
 
     public OutboxPublisher(
             OutboxClaimService outboxClaimService,
             KafkaTemplate<String, CatalogEvent> kafkaTemplate,
-            @Value("${kafka.topic.catalog-events}") String catalogEventsTopic
+            @Value("${kafka.topic.order-events}") String orderEventsTopic
     ) {
         this.outboxClaimService = outboxClaimService;
         this.kafkaTemplate = kafkaTemplate;
-        this.catalogEventsTopic = catalogEventsTopic;
+        this.orderEventsTopic = orderEventsTopic;
     }
 
     @Scheduled(fixedDelay = 5000)
@@ -51,7 +51,7 @@ public class OutboxPublisher {
             );
 
             ProducerRecord<String, CatalogEvent> record = new ProducerRecord<>(
-                    catalogEventsTopic,
+                    orderEventsTopic,
                     outboxEvent.getAggregateId().toString(),
                     event
             );
