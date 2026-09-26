@@ -168,4 +168,14 @@ public class OrderService {
 
         return OrderResponse.from(order, orderItemRepository.findAllByOrderId(order.getId()));
     }
+
+    @Transactional
+    public void markOrderAsDelivered(UUID orderId) {
+        orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
+        List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(orderId);
+        for(OrderItemEntity orderItem : orderItems) {
+            InventoryEntity inventory = inventoryRepository.findByProductId(orderItem.getProductId()).orElseThrow(()-> new InventoryNotFoundException(orderItem.getProductId()));
+            inventory.consume(orderItem.getQuantity());
+        }
+    }
 }
