@@ -83,6 +83,11 @@ public class OrderEntity {
         this.updatedAt = OffsetDateTime.now();
     }
 
+    public void markDelivered() {
+        this.status = "DELIVERED";
+        this.updatedAt = OffsetDateTime.now();
+    }
+
     public UUID getId() {
         return id;
     }
