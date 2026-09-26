@@ -84,9 +84,6 @@ public class OrderEntity {
     }
 
     public void markDelivered() {
-        if(!this.status.equals("CONFIRMED")) {
-            throw new IllegalStateException("Order must be in CONFIRMED state before marking delivered");
-        }
         this.status = "DELIVERED";
         this.updatedAt = OffsetDateTime.now();
     }
