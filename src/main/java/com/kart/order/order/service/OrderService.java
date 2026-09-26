@@ -171,11 +171,27 @@ public class OrderService {
 
     @Transactional
     public void markOrderAsDelivered(UUID orderId) {
-        orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
+
+        // idempotency for kafka consumer
+        if("DELIVERED".equals(order.getStatus())) {
+            return;
+        }
+
+        if(!"CONFIRMED".equals(order.getStatus())) {
+            throw new IllegalOrderStateException(orderId, "CONFIRMED", order.getStatus());
+        }
+
         List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(orderId);
+        if(orderItems.isEmpty()) {
+            throw new OrderException("No order items found for order id " + orderId);
+        }
+
         for(OrderItemEntity orderItem : orderItems) {
             InventoryEntity inventory = inventoryRepository.findByProductId(orderItem.getProductId()).orElseThrow(()-> new InventoryNotFoundException(orderItem.getProductId()));
             inventory.consume(orderItem.getQuantity());
         }
+
+        order.markDelivered();
     }
 }
