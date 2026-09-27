@@ -70,6 +70,13 @@ public class CartItemService {
         if(!cart.isActive()) {
             throw new IllegalCartStateException(cartId, "ACTIVE", cart.getStatus());
         }
+
+        // check if the product is ENABLED
+        ProductResponse productResponse = catalogClient.getProductById(productId);
+        if(!productResponse.status().equals("ENABLED")) {
+            throw new IneligibleProductException(productId, "Product is not in ENABLED state.");
+        }
+
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, productId);
         if(cartItem.isEmpty()) {
             throw new CartItemNotFoundException(cartId, productId);
