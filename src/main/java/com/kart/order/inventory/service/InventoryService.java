@@ -116,6 +116,6 @@ public class InventoryService {
         }
 
         // mark order delivered
-        order.markDelivered();
+        order.markDelivered(orderId);
     }
 }

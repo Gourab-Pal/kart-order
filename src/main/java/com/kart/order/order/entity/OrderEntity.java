@@ -1,5 +1,6 @@
 package com.kart.order.order.entity;
 
+import com.kart.order.order.exception.IllegalOrderStateException;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -83,7 +84,10 @@ public class OrderEntity {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public void markDelivered() {
+    public void markDelivered(UUID orderId) {
+        if (!this.status.equals("CONFIRMED")) {
+            throw new IllegalOrderStateException(orderId, "CONFIRMED", this.status);
+        }
         this.status = "DELIVERED";
         this.updatedAt = OffsetDateTime.now();
     }
