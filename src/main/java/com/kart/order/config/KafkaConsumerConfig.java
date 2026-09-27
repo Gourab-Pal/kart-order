@@ -1,6 +1,6 @@
 package com.kart.order.config;
 
-import com.kart.order.kafka.event.CatalogEvent;
+import com.kart.order.kafka.event.EventEnvelope;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +16,11 @@ import org.springframework.util.backoff.FixedBackOff;
 public class KafkaConsumerConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, CatalogEvent> catalogKafkaListenerContainerFactory(
-            ConsumerFactory<String, CatalogEvent> consumerFactory,
+    public ConcurrentKafkaListenerContainerFactory<String, EventEnvelope> eventKafkaListenerContainerFactory(
+            ConsumerFactory<String, EventEnvelope> consumerFactory,
             KafkaTemplate<Object, Object> kafkaTemplate
     ) {
-        ConcurrentKafkaListenerContainerFactory<String, CatalogEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<String, EventEnvelope> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
 
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate, this::getDeadLetterTopic);

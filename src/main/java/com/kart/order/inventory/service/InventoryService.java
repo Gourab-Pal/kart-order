@@ -6,9 +6,16 @@ import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryAlreadyExistsException;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
+import com.kart.order.order.entity.OrderEntity;
+import com.kart.order.order.entity.OrderItemEntity;
+import com.kart.order.order.exception.OrderException;
+import com.kart.order.order.exception.OrderNotFoundException;
+import com.kart.order.order.repository.OrderItemRepository;
+import com.kart.order.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -16,10 +23,19 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final CatalogClient catalogClient;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
-    public InventoryService(InventoryRepository inventoryRepository, CatalogClient catalogClient) {
+    public InventoryService(
+            InventoryRepository inventoryRepository,
+            CatalogClient catalogClient,
+            OrderItemRepository orderItemRepository,
+            OrderRepository orderRepository
+    ) {
         this.inventoryRepository = inventoryRepository;
         this.catalogClient = catalogClient;
+        this.orderItemRepository = orderItemRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Transactional
@@ -77,5 +93,29 @@ public class InventoryService {
         InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
         entity.consume(request.quantity());
         return InventoryResponse.from(inventoryRepository.save(entity));
+    }
+
+    @Transactional
+    public void consumeQuantityFromDeliveredEvent(UUID orderId) {
+
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException(orderId));
+        if(order.getStatus().equals("DELIVERED")) {
+            return;
+        }
+
+        List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(orderId);
+        if(orderItems.isEmpty()) {
+            throw new OrderException("No order has been created with orderId: " + orderId);
+        }
+
+        for(OrderItemEntity orderItem : orderItems) {
+            UUID productId = orderItem.getProductId();
+            int quantity = orderItem.getQuantity();
+            InventoryEntity entity = inventoryRepository.findByProductId(productId).orElseThrow(() -> new InventoryNotFoundException(productId));
+            entity.consume(quantity);
+        }
+
+        // mark order delivered
+        order.markDelivered(orderId);
     }
 }

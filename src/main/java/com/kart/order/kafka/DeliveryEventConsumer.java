@@ -11,33 +11,33 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class CatalogEventConsumer {
+public class DeliveryEventConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(CatalogEventConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeliveryEventConsumer.class);
     private final InventoryService inventoryService;
 
-    public CatalogEventConsumer(InventoryService inventoryService) {
+    public DeliveryEventConsumer(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
     }
 
     @KafkaListener(
-            topics = "${kafka.topic.catalog-events}",
+            topics = "${kafka.topic.delivery-events}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "eventKafkaListenerContainerFactory"
     )
     public void consume(EventEnvelope event) {
-        switch(event.eventType()) {
-            case "PRODUCT_CREATED" ->
-                handleProductCreated(event);
+        switch (event.eventType()) {
+            case "PRODUCTS_DELIVERED" ->
+                    handleProductsDelivered(event);
             default ->
-                throw new IllegalStateException("Unsupported catalog event type: " + event.eventType());
+                    throw new IllegalArgumentException("Unsupported delivery event type: " + event.eventType());
         }
     }
 
-    private void handleProductCreated(EventEnvelope event) {
+    private void handleProductsDelivered(EventEnvelope event) {
         JsonNode payload = event.payload();
-        UUID productId = UUID.fromString(payload.get("productId").asText());
-        inventoryService.createInventoryFromProductCreatedEvent(productId);
-        logger.info("Inventory created for product id: {}", productId);
+        UUID orderId = UUID.fromString(payload.get("orderId").asText());
+        inventoryService.consumeQuantityFromDeliveredEvent(orderId);
+        logger.info("Order consumed for products with orderId: {}", orderId);
     }
 }
