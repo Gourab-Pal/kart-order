@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public class IneligibleProductException extends RuntimeException {
     public IneligibleProductException(UUID productId, String message) {
-        super("Product " + productId + " is not eligible to be added to cart. Reason: " + message);
+        super("Product " + productId + " is not eligible. Reason: " + message);
     }
 }
