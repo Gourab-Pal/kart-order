@@ -192,6 +192,6 @@ public class OrderService {
             inventory.consume(orderItem.getQuantity());
         }
 
-        order.markDelivered();
+        order.markDelivered(orderId);
     }
 }
