@@ -4,6 +4,7 @@ import com.kart.order.cart.entity.CartEntity;
 import com.kart.order.cart.entity.CartItemEntity;
 import com.kart.order.cart.exception.CartNotFoundException;
 import com.kart.order.cart.exception.IllegalCartStateException;
+import com.kart.order.cart.exception.IneligibleProductException;
 import com.kart.order.cart.repository.CartItemRepository;
 import com.kart.order.cart.repository.CartRepository;
 import com.kart.order.catalog.client.CatalogClient;
@@ -79,7 +80,11 @@ public class OrderService {
         // find product details from catalog service
         List<ProductResponse> products = new ArrayList<>();
         for(CartItemEntity cartItem : cartItems) {
-            products.add(catalogClient.getProductById(cartItem.getProductId()));
+            ProductResponse productResponse = catalogClient.getProductById(cartItem.getProductId());
+            if(!productResponse.status().equals("ENABLED")) {
+                throw new IneligibleProductException(cartItem.getProductId(), "Product is not in ENABLED state.");
+            }
+            products.add(productResponse);
         }
 
         // create empty order with PENDING status
