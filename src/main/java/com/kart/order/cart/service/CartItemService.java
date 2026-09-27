@@ -9,9 +9,11 @@ import com.kart.order.cart.entity.CartItemEntity;
 import com.kart.order.cart.exception.CartItemNotFoundException;
 import com.kart.order.cart.exception.CartNotFoundException;
 import com.kart.order.cart.exception.IllegalCartStateException;
+import com.kart.order.cart.exception.IneligibleProductException;
 import com.kart.order.cart.repository.CartItemRepository;
 import com.kart.order.cart.repository.CartRepository;
 import com.kart.order.catalog.client.CatalogClient;
+import com.kart.order.catalog.dto.ProductResponse;
 import com.kart.order.inventory.entity.InventoryEntity;
 import com.kart.order.inventory.exception.InventoryNotFoundException;
 import com.kart.order.inventory.repository.InventoryRepository;
@@ -42,7 +44,10 @@ public class CartItemService {
         if(!cart.isActive()) {
             throw new IllegalCartStateException(cartId, "ACTIVE", cart.getStatus());
         }
-        catalogClient.verifyProductExists(cartItemCreateRequest.productId());
+        ProductResponse product = catalogClient.getProductById(cartItemCreateRequest.productId());
+        if(!product.status().equals("ENABLED")) {
+            throw new IneligibleProductException(product.id(), "Product is not in ENABLED state.");
+        }
         InventoryEntity inventory = inventoryRepository.findByProductId(cartItemCreateRequest.productId()).orElseThrow(()-> new InventoryNotFoundException(cartItemCreateRequest.productId()));
         Optional<CartItemEntity> cartItem = cartItemRepository.findByCartIdAndProductId(cartId, cartItemCreateRequest.productId());
         if(cartItem.isPresent()) {

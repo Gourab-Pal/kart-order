@@ -3,6 +3,7 @@ package com.kart.order.common.exception;
 import com.kart.order.cart.exception.CartItemNotFoundException;
 import com.kart.order.cart.exception.CartNotFoundException;
 import com.kart.order.cart.exception.IllegalCartStateException;
+import com.kart.order.cart.exception.IneligibleProductException;
 import com.kart.order.catalog.exception.ProductNotFoundException;
 import com.kart.order.checkout.exception.CheckoutException;
 import com.kart.order.common.dto.ExceptionResponse;
@@ -117,6 +118,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleOrderException(OrderException exception) {
+        log.error(exception.getMessage());
+        return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
+    }
+
+    @ExceptionHandler(IneligibleProductException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleIneligibleProductException(IneligibleProductException exception) {
         log.error(exception.getMessage());
         return new ExceptionResponse(exception.getMessage(), OffsetDateTime.now());
     }
