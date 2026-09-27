@@ -2,7 +2,7 @@ package com.kart.order.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kart.order.inventory.service.InventoryService;
-import com.kart.order.kafka.event.CatalogEvent;
+import com.kart.order.kafka.event.EventEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -23,9 +23,9 @@ public class CatalogEventConsumer {
     @KafkaListener(
             topics = "${kafka.topic.catalog-events}",
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "catalogKafkaListenerContainerFactory"
+            containerFactory = "eventKafkaListenerContainerFactory"
     )
-    public void consume(CatalogEvent event) {
+    public void consume(EventEnvelope event) {
         switch(event.eventType()) {
             case "PRODUCT_CREATED" ->
                 handleProductCreated(event);
@@ -34,7 +34,7 @@ public class CatalogEventConsumer {
         }
     }
 
-    private void handleProductCreated(CatalogEvent event) {
+    private void handleProductCreated(EventEnvelope event) {
         JsonNode payload = event.payload();
         UUID productId = UUID.fromString(payload.get("productId").asText());
         inventoryService.createInventoryFromProductCreatedEvent(productId);

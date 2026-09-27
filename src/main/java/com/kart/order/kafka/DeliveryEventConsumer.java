@@ -1,7 +1,8 @@
-package com.kart.order.kafka.event;
+package com.kart.order.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kart.order.inventory.service.InventoryService;
+import com.kart.order.kafka.event.EventEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,21 +23,21 @@ public class DeliveryEventConsumer {
     @KafkaListener(
             topics = "${kafka.topic.delivery-events}",
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "deliveryKafkaListenerContainerFactory"
+            containerFactory = "eventKafkaListenerContainerFactory"
     )
-    public void consume(DeliveryEvent event) {
+    public void consume(EventEnvelope event) {
         switch (event.eventType()) {
             case "PRODUCTS_DELIVERED" ->
-                handleProductsDelivered(event);
+                    handleProductsDelivered(event);
             default ->
-                throw new IllegalArgumentException("Unsupported delivery event type: " + event.eventType());
+                    throw new IllegalArgumentException("Unsupported delivery event type: " + event.eventType());
         }
     }
 
-    private void handleProductsDelivered(DeliveryEvent event) {
+    private void handleProductsDelivered(EventEnvelope event) {
         JsonNode payload = event.payload();
         UUID orderId = UUID.fromString(payload.get("orderId").asText());
-        inventoryService.createInventoryFromProductCreatedEvent(orderId);
+        inventoryService.consumeQuantityFromDeliveredEvent(orderId);
         logger.info("Order consumed for products with orderId: {}", orderId);
     }
 }
